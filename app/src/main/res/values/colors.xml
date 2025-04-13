@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="cyanblue">#447cbc</color>
+    <color name="iceberg">#6fadd8</color>
+    <color name="metallicblue">#24547c</color>
+    <color name="copperpenny">#b87a6b</color>
+    <color name="blackshadows">#bab3b5</color>
+    <color name="policeblue">#304b60</color>
+    <color name="lightgray">#e7e7e7</color>
+    <color name="darkgray">#2b2c2c</color>
+</resources>
