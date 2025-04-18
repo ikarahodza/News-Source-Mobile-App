@@ -110,7 +110,7 @@ fun NewsList(
     newsItems: List<NewsItem>,
     selectedCategory: String,
     modifier: Modifier = Modifier
-    ) {
+) {
     LazyColumn(
         modifier = modifier.testTag("news_list"),
         state = rememberLazyListState()
@@ -130,4 +130,3 @@ fun NewsList(
         }
     }
 }
-
