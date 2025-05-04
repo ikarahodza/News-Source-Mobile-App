@@ -48,6 +48,22 @@ fun NewsDetailsScreen(
             .take(2)
     }
 
+    /*
+    val relatedNews = remember(currentNews) {
+    allNews
+        .filter { it.category == currentNews.category && it.id != currentNews.id }
+        .sortedWith(compareBy(
+            { news ->
+                val currentDate = LocalDate.parse(currentNews.publishedDate, formatter)
+                val newsDate = LocalDate.parse(news.publishedDate, formatter)
+                abs(ChronoUnit.DAYS.between(currentDate, newsDate))
+            },
+            { it.title }
+        ))
+        .take(2)
+}
+     */
+
     BackHandler(onBack = onClose)
 
     Column(
