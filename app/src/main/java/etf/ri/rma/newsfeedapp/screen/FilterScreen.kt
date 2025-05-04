@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -19,140 +18,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button
-import androidx.compose.material3.Button
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
-import androidx.savedstate.serialization.saved
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FilterScreen(
-    selectedCategory: String,
-    onCategorySelected: (String) -> Unit,
-    onApplyFilters: (String, Pair<String, String>?, List<String>) -> Unit,
-    onBack: () -> Unit
-) {
-    var showDatePicker by remember { mutableStateOf(false) }
-    val dateRangePickerState = rememberDateRangePickerState()
-    var dateRangeDisplay by remember { mutableStateOf("Odaberite opseg datuma")}
-    var unwantedWordInput by remember { mutableStateOf(TextFieldValue("")) }
-    var unwantedWords by remember { mutableStateOf<List<String>> (emptyList())}
-
-    Scaffold {  paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            Text("Filtriraj po kategoriji: ", style = MaterialTheme.typography.titleMedium)
-
-            FilterSection(
-                selectedCategory = selectedCategory,
-                onCategorySelected = onCategorySelected,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            Text("Filtriraj po datumu: ", style = MaterialTheme.typography.titleMedium)
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Text (
-                    text = dateRangeDisplay,
-                    modifier = Modifier.weight(1f).testTag("filter_daterange_display")
-                )
-
-                Button(
-                    onClick = { showDatePicker = true },
-                    modifier = Modifier.testTag("filter_daterange_button")
-                ) {
-                    Text("Odaberi")
-                }
-
-            }
-
-            Text("Filtriraj nepozeljne rijeci: ", style = MaterialTheme.typography.titleMedium)
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                TextField(
-                    value = unwantedWordInput,
-                    onValueChange = { unwantedWordInput = it },
-                    modifier = Modifier.weight(1f)
-                        .testTag("filter_unwanted_input"),
-                    label = { Text("Unesite nepozeljnu rijec") }
-                )
-
-                Button(
-                    onClick = {
-                        val word = unwantedWordInput.text.trim()
-                        if(word.isNotBlank() && unwantedWords.none {it.equals(word, ignoreCase = true) }) {
-                            unwantedWords = unwantedWords + word
-                            unwantedWordInput = TextFieldValue("")
-                        }
-                    },
-                    modifier = Modifier.testTag("filter_unwanted_add_button")
-                ) {
-                    Text("+")
-                }
-            }
-
-            if(unwantedWords.isNotEmpty()) {
-                Column(
-                    modifier = Modifier.testTag("filter_unwanted_list")
-                ) {
-                    Text("Nepozeljne riejci: ")
-                    unwantedWords.forEach {
-                        word -> Text("- $word")
-                    }
-                }
-            }
-
-            Spacer (modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    val dateRange = if(dateRangePickerState.selectedStartDateMillis != null && dateRangePickerState.selectedEndDateMillis != null) {
-                        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                        val startDate = dateFormat.format(Date(dateRangePickerState.selectedStartDateMillis!!))
-                        val endDate = dateFormat.format(Date(dateRangePickerState.selectedEndDateMillis!!))
-                        Pair(startDate, endDate)
-                    } else {
-                        null
-                    }
-                    onApplyFilters(selectedCategory, dateRange, unwantedWords)
-                },
-                modifier = Modifier.fillMaxWidth().testTag("filter_apply_button")
-            ) {
-                Text("Primijeni filtere")
-            }
-
-
-        }
-    }
-}
-
- */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -236,38 +116,6 @@ fun FilterScreen(
 
             Text("Filtriraj nepoželjne riječi:", style = MaterialTheme.typography.titleMedium)
 
-            /*
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                TextField(
-                    value = unwantedWordInput.text,
-                    onValueChange = { unwantedWordInput = TextFieldValue(it) },
-                    label = { Text("Unesite nepoželjnu riječ") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("filter_unwanted_input"),
-                    trailingIcon = {
-                        Button(
-                            onClick = {
-                                val word = unwantedWordInput.text.trim()
-                                if (word.isNotBlank() && unwantedWords.none { it.equals(word, ignoreCase = true) }) {
-                                    unwantedWords = unwantedWords + word
-                                    unwantedWordInput = TextFieldValue("")
-                                }
-                            },
-                            modifier = Modifier.testTag("filter_unwanted_add_button")
-                        ) {
-                            Text("+")
-                        }
-                    }
-
-                )
-
-            }
-
-             */
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)

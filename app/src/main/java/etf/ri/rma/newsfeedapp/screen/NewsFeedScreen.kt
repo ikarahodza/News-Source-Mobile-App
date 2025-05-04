@@ -58,7 +58,6 @@ fun FilterSection(
     FlowRow(
         modifier = modifier
             .fillMaxWidth(),
-            //.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         categories.forEach { category ->
@@ -127,14 +126,12 @@ fun NewsFeedScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                //.testTag("newslist")
         ) {
             FilterSection(
                 selectedCategory = selectedCategory,
                 onCategorySelected = { category ->
                     if (category == "Više filtera ...") {
                         navController?.currentBackStackEntry?.savedStateHandle?.apply {
-                            // Pripremi stanje koje će FilterScreen koristiti
                             set("selectedCategory", selectedCategory)
                             set("dateRange", dateRangeFilter)
                             set("unwantedWords", unwantedWordsFilter)
@@ -156,7 +153,6 @@ fun NewsFeedScreen(
         }
     }
 
-    // Primanje rezultata sa FilterScreen-a
     val navBackStackEntry = navController?.currentBackStackEntry
     navBackStackEntry?.savedStateHandle?.getLiveData<String>("filteredCategory")?.observeForever {
         selectedCategory = it
