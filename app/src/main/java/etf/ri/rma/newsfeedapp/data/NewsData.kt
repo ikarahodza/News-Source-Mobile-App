@@ -13,7 +13,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = false,
                 source = "Klix",
-                publishedDate = "2024-09-27"
+                publishedDate = "27-09-2024"
             ),
             NewsItem(
                 id = "2",
@@ -23,7 +23,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = true,
                 source = "SportSport",
-                publishedDate = "2025-04-02"
+                publishedDate = "02-04-2025"
             ),
             NewsItem(
                 id = "3",
@@ -33,7 +33,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = false,
                 source = "N1",
-                publishedDate = "2025-03-12"
+                publishedDate = "12-03-2025"
             ),
             NewsItem(
                 id = "4",
@@ -43,7 +43,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = true,
                 source = "Klix",
-                publishedDate = "2025-04-02"
+                publishedDate = "02-04-2025"
             ),
             NewsItem(
                 id = "5",
@@ -53,7 +53,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = true,
                 source = "Sportski žurnal",
-                publishedDate = "2025-04-04"
+                publishedDate = "04-04-2025"
             ),
             NewsItem(
                 id = "6",
@@ -63,7 +63,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = true,
                 source = "Al-jazeera",
-                publishedDate = "2025-04-10"
+                publishedDate = "10-04-2025"
             ),
             NewsItem(
                 id = "7",
@@ -73,7 +73,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = true,
                 source = "Al-jazeera",
-                publishedDate = "2025-04-10"
+                publishedDate = "10-04-2025"
             ),
             NewsItem(
                 id = "8",
@@ -83,7 +83,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = false,
                 source = "Klix",
-                publishedDate = "2025-04-12"
+                publishedDate = "12-04-2025"
             ),
             NewsItem(
                 id = "9",
@@ -93,7 +93,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = false,
                 source = "N1",
-                publishedDate = "2025-01-30"
+                publishedDate = "30-01-2025"
             ),
             NewsItem(
                 id = "10",
@@ -103,7 +103,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = false,
                 source = "Klix",
-                publishedDate = "2025-04-12"
+                publishedDate = "12-04-2025"
             ),
             NewsItem(
                 id = "11",
@@ -113,7 +113,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = true,
                 source = "N1",
-                publishedDate = "2025-03-28"
+                publishedDate = "28-03-2025"
             ),
             NewsItem(
                 id = "12",
@@ -123,7 +123,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = false,
                 source = "Raport",
-                publishedDate = "2025-04-12"
+                publishedDate = "12-04-2025"
             ),
             NewsItem(
                 id = "13",
@@ -133,7 +133,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = true,
                 source = "N1",
-                publishedDate = "2025-04-11"
+                publishedDate = "11-04-2025"
             ),
             NewsItem(
                 id = "14",
@@ -143,7 +143,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = false,
                 source = "Raport",
-                publishedDate = "2025-04-02"
+                publishedDate = "02-04-2025"
             ),
             NewsItem(
                 id = "15",
@@ -153,7 +153,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = true,
                 source = "Klix",
-                publishedDate = "2025-04-8"
+                publishedDate = "08-04-2025"
             ),
             NewsItem(
                 id = "16",
@@ -163,7 +163,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = false,
                 source = "Raport",
-                publishedDate = "2025-04-12"
+                publishedDate = "12-04-2025"
             ),
             NewsItem(
                 id = "17",
@@ -173,7 +173,7 @@ object NewsData {
                 category = "Sport",
                 isFeatured = true,
                 source = "Oslobodjenje",
-                publishedDate = "2025-04-02"
+                publishedDate = "02-04-2025"
             ),
             NewsItem(
                 id = "18",
@@ -183,7 +183,7 @@ object NewsData {
                 category = "Nauka/tehnologija",
                 isFeatured = true,
                 source = "Oslobodjenje",
-                publishedDate = "2025-04-10"
+                publishedDate = "10-04-2025"
             ),
             NewsItem(
                 id = "19",
@@ -193,7 +193,7 @@ object NewsData {
                 category = "Politika",
                 isFeatured = true,
                 source = "Al-jazeera",
-                publishedDate = "2025-04-07"
+                publishedDate = "07-04-2025"
             ),
             NewsItem(
                 id = "20",
@@ -203,8 +203,13 @@ object NewsData {
                 category = "Sport",
                 isFeatured = false,
                 source = "SportSport",
-                publishedDate = "2025-04-12"
+                publishedDate = "12-04-2025"
             )
         )
     }
+
+    fun getNewsById(id: String): NewsItem {
+        return getAllNews().first { it.id == id }
+    }
+
 }

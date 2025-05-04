@@ -1,5 +1,6 @@
 package etf.ri.rma.newsfeedapp
 
+import NewsFeedAppNavigation
 import android.os.Bundle
 import android.view.Surface
 import androidx.activity.ComponentActivity
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NewsFeedScreen()
+                    NewsFeedAppNavigation()
                 }
             }
         }

@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation ("com.google.android.material:material:1.9.0")
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

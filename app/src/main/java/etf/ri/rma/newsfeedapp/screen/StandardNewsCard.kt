@@ -1,6 +1,7 @@
 package etf.ri.rma.newsfeedapp.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,11 +23,15 @@ import etf.ri.rma.newsfeedapp.R
 import etf.ri.rma.newsfeedapp.model.NewsItem
 
 @Composable
-fun StandardNewsCard(newsItem: NewsItem) {
+fun StandardNewsCard(
+    newsItem: NewsItem,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
