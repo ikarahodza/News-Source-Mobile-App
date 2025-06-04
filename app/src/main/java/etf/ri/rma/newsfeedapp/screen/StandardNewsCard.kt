@@ -15,18 +15,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import etf.ri.rma.newsfeedapp.R
 import etf.ri.rma.newsfeedapp.model.NewsItem
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun StandardNewsCard(
     newsItem: NewsItem,
     onClick: () -> Unit = {}
 ) {
+    val date = newsItem.publishedDate
+    val fixed = formatDate(date)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,12 +49,13 @@ fun StandardNewsCard(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.newsimg),
-                contentDescription = "Image description",
+            AsyncImage(
+                model = newsItem.imageUrl,
+                contentDescription = "News image",
                 modifier = Modifier
                     .width(120.dp)
-                    .height(120.dp)
+                    .height(120.dp),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -74,7 +81,7 @@ fun StandardNewsCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${newsItem.source} • ${newsItem.publishedDate}",
+                    text = "${newsItem.source} • ${fixed}",
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(top = 8.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -82,4 +89,15 @@ fun StandardNewsCard(
             }
         }
     }
+    fun formatDate(isoDate: String): String {
+        return try {
+            val instant = java.time.Instant.parse(isoDate)
+            val date = instant.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+            val formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale("bs"))
+            " ${date.format(formatter)}"
+        } catch (e: Exception) {
+            "Datum: $isoDate"
+        }
+    }
 }
+

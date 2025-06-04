@@ -1,215 +1,156 @@
 package etf.ri.rma.newsfeedapp.data
 
+import etf.ri.rma.newsfeedapp.data.network.ImagaDAO
+import etf.ri.rma.newsfeedapp.data.network.NewsDAO
 import etf.ri.rma.newsfeedapp.model.NewsItem
+import java.util.UUID
 
 object NewsData {
-    fun getAllNews(): List<NewsItem> {
-        return listOf(
-            NewsItem(
-                id = "1",
-                title = "Britanski premijer: Stanje daleko od idealnog, “stvari pogoršati prije nego što postanu bolje”",
-                snippet = "Keir Starmer izjavio je u utorak da će biti potrebno mnogo vremena da se Britanija obnovi i oslobodi svih nedaća koje su, kako kaže, zavladale kraljevstvom pod prethodnom konzervativnom vladom...",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = false,
-                source = "Klix",
-                publishedDate = "27-09-2024"
-            ),
-            NewsItem(
-                id = "2",
-                title = "Objavljen sastav Real Madrida za novu sezonu s Alonsom na klupi: Nema Modrića i još tri zvijezde!",
-                snippet = "Unazad sedmicama se šire glasine da će Xabi Alonso postati novi trener Real Madrida, a sad se pojavio i mogući sastav Kraljeva za narednu takmičarsku godinu i to bez niza velikih zvijezda.",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = true,
-                source = "SportSport",
-                publishedDate = "02-04-2025"
-            ),
-            NewsItem(
-                id = "3",
-                title = "Arktik je u nevolji, cijeli svijet će osjetiti posljedice",
-                snippet = "Arktik je dugo ispunjavao ljude strahopoštovanjem, ali sada postoje duboko zabrinjavajući signali koji dolaze iz zaleđenog krajolika na vrhu našeg planeta, a naučnici su duboko zabrinuti za njegovu budućnost jer Trumpova administracija povlači SAD iz globalne klimatske strategije i uništava svoje naučne agencije.",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = false,
-                source = "N1",
-                publishedDate = "12-03-2025"
-            ),
-            NewsItem(
-                id = "4",
-                title = "Članovi Predsjedništva BiH održali sastanak s Erdoganom u Antaliji",
-                snippet = "Iako detalji razgovora nisu zvanično saopćeni, pretpostavlja se da je jedna od tema bila aktuelna politička kriza u Bosni i Hercegovini...",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = true,
-                source = "Klix",
-                publishedDate = "02-04-2025"
-            ),
-            NewsItem(
-                id = "5",
-                title = "Elvedina Muzaferija osvojila osmo mjesto u superveleslalomu na Državnom prvenstvu Francuske",
-                snippet = "Greška u četvrtom sektoru udaljila ju je od podijuma te je s vremenom 1:27.90 zauzela osmo mjesto, nakon što je prethodno na utrci spusta bila drugoplasirana.",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = true,
-                source = "Sportski žurnal",
-                publishedDate = "04-04-2025"
-            ),
-            NewsItem(
-                id = "6",
-                title = "EU će graditi nekoliko ‘megafabrika’ vještačke inteligencije",
-                snippet = "Dok fabrike vještačke inteligencije sa najboljim učinkom imaju superkompjutere opremljene sa do 25.000 naprednih AI procesora, megafabrika bi premašila 100.000 procesora AI.",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = true,
-                source = "Al-jazeera",
-                publishedDate = "10-04-2025"
-            ),
-            NewsItem(
-                id = "7",
-                title = "UN: Trgovinski rat ‘katastrofalan’ za zemlje u razvoju",
-                snippet = "Svjetska tržišta u petak su i dalje suočena s turbulencijama iako je Trump objavio da na 90 dana odgađa uvođenje carina svima osim Kini.",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = true,
-                source = "Al-jazeera",
-                publishedDate = "10-04-2025"
-            ),
-            NewsItem(
-                id = "8",
-                title = "U Sarajevu počeo Turnir mladih džudo nada, stigli i osvajači olimpijskih medalja",
-                snippet = "Organizacijom Turnira mladih nada, koji je počeo danas u Sarajevo, i Kodokan seminara, koji je startao u petak, Džudo savez Bosne i Hercegovine zaokružio je jednogodišnji ciklus takmičenja..",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = false,
-                source = "Klix",
-                publishedDate = "12-04-2025"
-            ),
-            NewsItem(
-                id = "9",
-                title = "Naučnici na tragu uzroka tajanstvenog pada broja ptica u amazonskoj džungli",
-                snippet = "Duboko u srcu ekvadorske Amazonije, u jednom od najizolovanijih biodiverzitetskih centara na svijetu, nešto se neobjašnjivo događa s pticama. ..",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = false,
-                source = "N1",
-                publishedDate = "30-01-2025"
-            ),
-            NewsItem(
-                id = "10",
-                title = "Američki dolar pao na najnižu vrijednost u posljednje tri godine, strahuje se od recesije",
-                snippet = "Indeks američkog dolara pao je u petak na 3-godišnju najnižu cifru od 99,014 jer je agresivna trgovinska politika američkog predsjednika Donalda Trumpa ojačala zabrinutost zbog recesije u zemlji.",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = false,
-                source = "Klix",
-                publishedDate = "12-04-2025"
-            ),
-            NewsItem(
-                id = "11",
-                title = "Analiza protivnika: Šta čeka Bosnu i Hercegovinu na Eurobasketu?",
-                snippet = "Košarkaška reprezentacija Bosne i Hercegovine saznala je protivnike grupne faze Eurobasketa, a naš nacionalni tim svoje utakmice igrat će na Kipru (Limassol).",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = true,
-                source = "N1",
-                publishedDate = "28-03-2025"
-            ),
-            NewsItem(
-                id = "12",
-                title = "Misterija Saturnovog mjeseca sve dublja",
-                snippet = "NASA je objavila da su najnoviji podaci iz arhive misije Cassini otkrili jake indikacije o postojanju tečnog okeana ispod ledene kore Saturnovog mjeseca Enceladusa.",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = false,
-                source = "Raport",
-                publishedDate = "12-04-2025"
-            ),
-            NewsItem(
-                id = "13",
-                title = "Dr. Nedim Hogić: Kako podložnost BiH stranom utjecaju doprinosi korupciji",
-                snippet = "Postoji niz faktora koji doprinose visokom stepenu korupcije u Bosni i Hercegovini, a jedan od glavnih je \"snažna i neuobičajena podložnost zemlje stranom utjecaju i lobiranju\", objašnjava dr. Nedim Hogić...",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = true,
-                source = "N1",
-                publishedDate = "11-04-2025"
-            ),
-            NewsItem(
-                id = "14",
-                title = "Bayern traži napadača, prvi izbor golgeter porijekom iz BiH",
-                snippet = "Benjamin Šeško, Viktor Gyokeres i Moise Kean nalaze se na užem izboru Bayern Munchena za novog napadača, prenosi ESPN...",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = false,
-                source = "Raport",
-                publishedDate = "02-04-2025"
-            ),
-            NewsItem(
-                id = "15",
-                title = "Naučnici oživjeli izumrlu vrstu vuka koja je postala poznata zahvaljujući \"Game of Thronesu\"",
-                snippet = "Američka kompanija Colossal Biosciences, specijalizovana za genetski inžinjering, objavila je da su njeni naučnici uspjeli da uzgoje tri šteneta vuka iz vrste koja je izumrla prije više od 10.000 godina,...",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = true,
-                source = "Klix",
-                publishedDate = "08-04-2025"
-            ),
-            NewsItem(
-                id = "16",
-                title = "Helez se sastao s turskim ministrom odbrane: Nakon oklopnih vozila i bespilotnih letjelica, šta je sada na redu?",
-                snippet = "Zamjenik predsjedavajuće Vijeća ministara i ministar odbrane Bosne i Hercegovine Zukan Helez, na marginama 4. Diplomatskog foruma u Antaliji sastao se sa turskim kolegom Yasarom Gulerom...",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = false,
-                source = "Raport",
-                publishedDate = "12-04-2025"
-            ),
-            NewsItem(
-                id = "17",
-                title = "(FOTO) Grbavica spremna za meč Željezničara i GOŠK-a",
-                snippet = "Igrači obje ekipe imat će idealne uslove za igru, s obzirom na to da je teren stadiona Grbavica u dobroj stanju...",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = true,
-                source = "Oslobodjenje",
-                publishedDate = "02-04-2025"
-            ),
-            NewsItem(
-                id = "18",
-                title = "Adi Pandžić o potencijalu 3D printanja: Od igara do spašavanja života",
-                snippet = "Za docenta Mašinskog fakulteta u Sarajevu, dr. Adija Pandžića, 3D printanje je moćan alat koji mijenja industriju i medicinu.",
-                imageUrl = null,
-                category = "Nauka/tehnologija",
-                isFeatured = true,
-                source = "Oslobodjenje",
-                publishedDate = "10-04-2025"
-            ),
-            NewsItem(
-                id = "19",
-                title = "UN najavio smanjenje broja humanitarnih radnika za 20 posto zbog smanjenja finansiranja",
-                snippet = "Neki od rezova došli su iz SAD-a. Neki su došli iz drugih zemalja, kaže glasnogovornik UN-a.",
-                imageUrl = null,
-                category = "Politika",
-                isFeatured = true,
-                source = "Al-jazeera",
-                publishedDate = "07-04-2025"
-            ),
-            NewsItem(
-                id = "20",
-                title = "Stopirani pregovori Flicka i Barcelone, otkriveno kakav uslov je postavio za produženje ugovora",
-                snippet = "Čelnici Barcelone odlučili su ponuditi Hansiju Flicku novi ugovor, ali njemački stručnjak im je rekao šta mu je jasan uslov koji moraju ispuniti ukoliko žele da potpiše produženje saradnje.",
-                imageUrl = null,
-                category = "Sport",
-                isFeatured = false,
-                source = "SportSport",
-                publishedDate = "12-04-2025"
-            )
+
+    private val initialNews = listOf(
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Breakthrough in Quantum Computing Technology",
+            snippet = "Scientists at leading research institutions have achieved a major milestone in quantum computing, demonstrating unprecedented processing capabilities that could revolutionize multiple industries.",
+            imageUrl = "https://example.com/quantum-computing.jpg",
+            publishedDate = "01-06-2025",
+            category = "Nauka/tehnologija",
+            source = "Tech News Daily",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Global Climate Summit Reaches Historic Agreement",
+            snippet = "World leaders gathered at the annual climate summit have reached a groundbreaking agreement on carbon emission reductions, setting ambitious targets for the next decade.",
+            imageUrl = "https://example.com/climate-summit.jpg",
+            publishedDate = "01-06-2025",
+            category = "Politika",
+            source = "Environmental Report",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Championship Final Breaks Viewership Records",
+            snippet = "The championship final attracted over 100 million viewers worldwide, setting new records for sports broadcasting and digital streaming platforms.",
+            imageUrl = "https://example.com/championship.jpg",
+            publishedDate = "31-05-2025",
+            category = "Sport",
+            source = "Sports Network",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Revolutionary Art Exhibition Opens in Major Gallery",
+            snippet = "A groundbreaking art exhibition featuring works from emerging artists opens this week, showcasing innovative techniques and contemporary themes.",
+            imageUrl = "https://example.com/art-exhibition.jpg",
+            publishedDate = "31-05-2025",
+            category = "Umjetnost",
+            source = "Art Today",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Medical Research Breakthrough in Cancer Treatment",
+            snippet = "Researchers have developed a new cancer treatment that shows remarkable success rates in clinical trials, offering hope to millions of patients worldwide.",
+            imageUrl = "https://example.com/medical-research.jpg",
+            publishedDate = "30-05-2025",
+            category = "Nauka/tehnologija",
+            source = "Medical Journal",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Major Political Reform Proposal Announced",
+            snippet = "Government officials have announced a comprehensive political reform proposal aimed at increasing transparency and citizen participation in democratic processes.",
+            imageUrl = "https://example.com/political-reform.jpg",
+            publishedDate = "30-05-2025",
+            category = "Politika",
+            source = "Political Times",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Olympic Preparations Reach Final Stage",
+            snippet = "With months to go before the games, Olympic preparations are in full swing as athletes from around the world make final adjustments to their training regimens.",
+            imageUrl = "https://example.com/olympics.jpg",
+            publishedDate = "29-05-2025",
+            category = "Sport",
+            source = "Olympic News",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Digital Art Revolution Transforms Creative Industry",
+            snippet = "Digital art platforms and NFT marketplaces are reshaping how artists create, distribute, and monetize their work in the modern creative economy.",
+            imageUrl = "https://example.com/digital-art.jpg",
+            publishedDate = "29-05-2025",
+            category = "Umjetnost",
+            source = "Digital Arts Weekly",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "Space Exploration Mission Achieves New Milestone",
+            snippet = "The latest space exploration mission has successfully achieved its primary objectives, bringing scientists closer to understanding the mysteries of our solar system.",
+            imageUrl = "https://example.com/space-mission.jpg",
+            publishedDate = "28-05-2025",
+            category = "Nauka/tehnologija",
+            source = "Space Science Today",
+            isFeatured = false
+        ),
+        NewsItem(
+            uuid = UUID.randomUUID().toString(),
+            title = "International Trade Agreement Finalised",
+            snippet = "Major world economies have finalized a comprehensive trade agreement that promises to boost global commerce and economic cooperation.",
+            imageUrl = "https://example.com/trade-agreement.jpg",
+            publishedDate = "28-05-2025",
+            category = "Politika",
+            source = "Economic Herald",
+            isFeatured = false
         )
+    )
+
+    private val allNews: MutableList<NewsItem> = initialNews.toMutableList()
+
+    private var newsDAO: NewsDAO? = null
+    private var imageDAO: ImagaDAO? = null
+
+    fun getAllNews(): List<NewsItem> {
+        return allNews.toList()
     }
 
-    fun getNewsById(id: String): NewsItem {
-        return getAllNews().first { it.id == id }
+    fun addNews(news: List<NewsItem>) {
+        news.forEach { newItem ->
+            val existingIndex = allNews.indexOfFirst { it.uuid == newItem.uuid }
+            if (existingIndex != -1) {
+                allNews[existingIndex] = newItem
+            } else {
+                allNews.add(0, newItem)
+            }
+        }
     }
 
+    fun updateNewsItem(newsItem: NewsItem) {
+        val index = allNews.indexOfFirst { it.uuid == newsItem.uuid }
+        if (index != -1) {
+            allNews[index] = newsItem
+        }
+    }
+
+    fun getNewsDAO(): NewsDAO {
+        return newsDAO ?: run {
+            val dao = NewsDAO()
+            newsDAO = dao
+            dao
+        }
+    }
+
+    fun getImageDAO(): ImagaDAO {
+        return imageDAO ?: run {
+            val dao = ImagaDAO()
+            imageDAO = dao
+            dao
+        }
+    }
 }
+

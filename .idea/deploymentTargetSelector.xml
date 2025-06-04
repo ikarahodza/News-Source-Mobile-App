@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TestS2">
+      <SelectionState runConfigName="TestS3">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="detaljiVijestiNajblizeVijesti()">
+      <SelectionState runConfigName="testImagga()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="detaljiVijestiNajblizeVijestiBack()">
+      <SelectionState runConfigName="testIfCacheingWorks()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="filterOutWordFromThirdNews()">
+      <SelectionState runConfigName="testIfCacheingWorks2()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="detaljiVijesti()">
+      <SelectionState runConfigName="testImaggaFailed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

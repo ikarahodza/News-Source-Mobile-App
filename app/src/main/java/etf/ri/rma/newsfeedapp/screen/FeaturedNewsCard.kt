@@ -15,8 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import etf.ri.rma.newsfeedapp.R
 import etf.ri.rma.newsfeedapp.model.NewsItem
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 @Composable
@@ -24,6 +27,8 @@ fun FeaturedNewsCard(
     newsItem: NewsItem,
     onClick: () -> Unit = {}
     ){
+    val date = newsItem.publishedDate
+    val fixed = formatDate(date)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,9 +41,9 @@ fun FeaturedNewsCard(
         )
     ) {
         Column {
-            Image(
-                painter = painterResource(id = R.drawable.newsbanner),
-                contentDescription = "image",
+            AsyncImage(
+                model = newsItem.imageUrl,
+                contentDescription = "News image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -68,7 +73,7 @@ fun FeaturedNewsCard(
             )
 
             Text(
-                text = "${newsItem.source} • ${newsItem.publishedDate}",
+                text = "${newsItem.source} • ${fixed}",
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,6 +81,16 @@ fun FeaturedNewsCard(
                     .padding(top = 8.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+    fun formatDate(isoDate: String): String {
+        return try {
+            val instant = java.time.Instant.parse(isoDate)
+            val date = instant.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+            val formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale("bs"))
+            " ${date.format(formatter)}"
+        } catch (e: Exception) {
+            "Datum: $isoDate"
         }
     }
 }

@@ -1,5 +1,7 @@
 package etf.ri.rma.newsfeedapp.screen
 
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,11 +30,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
+import etf.ri.rma.newsfeedapp.data.NewsService
+import etf.ri.rma.newsfeedapp.data.network.NewsDAO
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,17 +45,34 @@ fun FilterScreen(
 ) {
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
 
-    var selectedCategory by remember { mutableStateOf(savedStateHandle?.get<String>("selectedCategory") ?: "Sve") }
+
+    var selectedCategory by remember {
+        mutableStateOf(
+            savedStateHandle?.get<String>("selectedCategory") ?: "Sve"
+        )
+    }
+
+    var clickedCategories by remember {
+        mutableStateOf(
+            savedStateHandle?.get<List<String>>("clickedCategories") ?: emptySet()
+        )
+    }
+
     var showDatePicker by remember { mutableStateOf(false) }
     val dateRangePickerState = rememberDateRangePickerState()
-    var dateRangeDisplay by remember { mutableStateOf(
-        savedStateHandle?.get<Pair<String, String>?>("dateRange")?.let {
-            "${it.first} - ${it.second}"
-        } ?: "Odaberite opseg datuma"
-    )
+    var dateRangeDisplay by remember {
+        mutableStateOf(
+            savedStateHandle?.get<Pair<String, String>?>("dateRange")?.let {
+                "${it.first} - ${it.second}"
+            } ?: "Odaberite opseg datuma"
+        )
     }
     var unwantedWordInput by remember { mutableStateOf(TextFieldValue("")) }
-    var unwantedWords by remember { mutableStateOf(savedStateHandle?.get<List<String>>("unwantedWords") ?: emptyList()) }
+    var unwantedWords by remember {
+        mutableStateOf(
+            savedStateHandle?.get<List<String>>("unwantedWords") ?: emptyList()
+        )
+    }
     var newWord by remember { mutableStateOf("") }
 
     Scaffold { paddingValues ->
@@ -65,7 +86,12 @@ fun FilterScreen(
 
             FilterSection(
                 selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it },
+                onCategorySelected = { category ->
+                    selectedCategory = category
+                    if (!clickedCategories.contains(category)) {
+                        clickedCategories = clickedCategories + category
+                    }
+                },
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -98,7 +124,8 @@ fun FilterScreen(
                             val end = dateRangePickerState.selectedEndDateMillis
                             if (start != null && end != null) {
                                 val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                                dateRangeDisplay = "${format.format(Date(start))};${format.format(Date(end))}"
+                                dateRangeDisplay =
+                                    "${format.format(Date(start))};${format.format(Date(end))}"
                             }
                         }) {
                             Text("Potvrdi")
@@ -144,9 +171,11 @@ fun FilterScreen(
             }
 
             if (unwantedWords.isNotEmpty()) {
-                Column(modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .testTag("filter_unwanted_list")) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .testTag("filter_unwanted_list")
+                ) {
                     Text("Nepoželjne riječi:")
                     unwantedWords.forEach {
                         Text(text = it)
@@ -156,34 +185,49 @@ fun FilterScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
-                    val range = if (dateRangePickerState.selectedStartDateMillis != null && dateRangePickerState.selectedEndDateMillis != null) {
-                        val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                        val start = format.format(Date(dateRangePickerState.selectedStartDateMillis!!))
-                        val end = format.format(Date(dateRangePickerState.selectedEndDateMillis!!))
-                        Pair(start, end)
-                    } else null
 
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set("filteredCategory", selectedCategory)
-                        set("filteredDateRange", range)
-                        set("filteredWords", unwantedWords)
-                    }
+                Button(
+                    onClick = {
+                        // Poslati trenutno selektovanu kategoriju
+                        navController.previousBackStackEntry?.savedStateHandle?.set("temporaryCategory", selectedCategory)
+                        // Poslati i set kliknanih kategorija
+                        navController.previousBackStackEntry?.savedStateHandle?.set("clickedCategories", clickedCategories)
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Nazad")
+                }
 
-                    navController.popBackStack()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("filter_apply_button")
-            ) {
-                Text("Primijeni filtere")
+                Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    onClick = {
+                        val range =
+                            if (dateRangePickerState.selectedStartDateMillis != null && dateRangePickerState.selectedEndDateMillis != null) {
+                                val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                                val start =
+                                    format.format(Date(dateRangePickerState.selectedStartDateMillis!!))
+                                val end =
+                                    format.format(Date(dateRangePickerState.selectedEndDateMillis!!))
+                                Pair(start, end)
+                            } else null
+
+                        navController.previousBackStackEntry?.savedStateHandle?.apply {
+                            set("filteredCategory", selectedCategory)
+                            set("filteredDateRange", range)
+                            set("filteredWords", unwantedWords)
+                            set("clickedCategories", clickedCategories)
+                        }
+
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("filter_apply_button")
+                ) {
+                    Text("Primijeni filtere")
+                }
             }
         }
     }
-}
-
-
-
-
-
