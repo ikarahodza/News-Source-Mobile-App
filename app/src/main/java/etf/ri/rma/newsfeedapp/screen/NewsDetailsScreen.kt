@@ -22,21 +22,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import etf.ri.rma.newsfeedapp.data.NewsData
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,9 +41,7 @@ import etf.ri.rma.newsfeedapp.model.NewsItem
 import coil.compose.AsyncImage
 import etf.ri.rma.newsfeedapp.data.NewsService
 import etf.ri.rma.newsfeedapp.data.NewsService.allNews
-import etf.ri.rma.newsfeedapp.data.network.NewsDAO
 import etf.ri.rma.newsfeedapp.data.network.ImagaDAO
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -82,14 +75,12 @@ fun NewsDetailsScreen(
             currentNews = newsItem
 
             try {
-                //relatedNews = NewsService.getSimilarStories(newsId)
                 Log.d("NewsDetailsScreen", "Pokrenut LaunchedEffect za $newsId")
                 if (fetchedSimilarFor[newsId] != true) {
                     try {
                         relatedNews = NewsService.getSimilarStories(newsId)
                         fetchedSimilarFor[newsId] = true
 
-                        // Dodaj ako ih nema već
                         val updatedList = allNews.value.toMutableList()
                         relatedNews.forEach { item ->
                             if (updatedList.none { it.uuid == item.uuid }) {

@@ -127,7 +127,7 @@ fun NewsFeedScreen(
                 val categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
                 //allNews = categoryNews
 
-                val combinedNews = (allNews + categoryNews).distinctBy { it.uuid }
+                val combinedNews = (categoryNews + allNews).distinctBy { it.uuid }
                 allNews = combinedNews
             }
         } catch(e: Exception){
@@ -273,7 +273,7 @@ fun NewsList(
             }
         } else {
             items(newsItems) { newsItem ->
-                if (newsItem.isFeatured) {
+            if (newsItem.isFeatured) {
                     FeaturedNewsCard(
                         newsItem = newsItem,
                         onClick = { onNewsSelected(newsItem.uuid) }

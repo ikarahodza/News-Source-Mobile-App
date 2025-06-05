@@ -16,11 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import etf.ri.rma.newsfeedapp.R
 import etf.ri.rma.newsfeedapp.model.NewsItem
 import java.time.format.DateTimeFormatter
@@ -33,6 +36,18 @@ fun StandardNewsCard(
 ) {
     val date = newsItem.publishedDate
     val fixed = formatDate(date)
+
+    val context = LocalContext.current
+
+    val imageUrl = newsItem.imageUrl
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .data(imageUrl)
+            .error(R.drawable.newsimg)
+            .placeholder(R.drawable.newsimg)
+            .build()
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,15 +64,14 @@ fun StandardNewsCard(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            AsyncImage(
-                model = newsItem.imageUrl,
+            Image(
+                painter = painter,
                 contentDescription = "News image",
                 modifier = Modifier
                     .width(120.dp)
                     .height(120.dp),
                 contentScale = ContentScale.Crop
             )
-
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(

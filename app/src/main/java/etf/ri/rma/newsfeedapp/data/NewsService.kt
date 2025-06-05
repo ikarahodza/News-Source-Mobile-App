@@ -47,6 +47,7 @@ object NewsService {
         return _allNews.value
     }
 
+
     suspend fun getNewsByCategory(category: String, forceRefresh: Boolean = false): List<NewsItem> {
         if (category == "Sve") {
             return getAllNews()
@@ -97,7 +98,6 @@ object NewsService {
             return filterByCategory(_allNews.value, category)
         }
     }
-
 
     private fun filterByCategory(news: List<NewsItem>, category: String): List<NewsItem> {
         return news.filter { newsItem ->
