@@ -29,7 +29,6 @@ import etf.ri.rma.newsfeedapp.model.NewsItem
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -126,7 +125,10 @@ fun NewsFeedScreen(
             } else {
                 val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
                 val categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-                allNews = categoryNews
+                //allNews = categoryNews
+
+                val combinedNews = (allNews + categoryNews).distinctBy { it.uuid }
+                allNews = combinedNews
             }
         } catch(e: Exception){
             allNews = emptyList()
@@ -134,29 +136,6 @@ fun NewsFeedScreen(
             isLoading = false
         }
     }
-
-    /*
-    LaunchedEffect(backStackEntry?.savedStateHandle) {
-        val handle = backStackEntry?.savedStateHandle ?: return@LaunchedEffect
-
-        handle.get<String>("temporaryCategory")?.let { tempCategory ->
-            handle.remove<String>("temporaryCategory")
-
-            if (tempCategory != "Sve") {
-                isLoading = true
-                try {
-                    val apiCategory = NewsService.mapAPIToUICategory(tempCategory)
-                    val newNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-                    allNews = newNews + allNews
-                } catch (e: Exception) {
-                } finally {
-                    isLoading = false
-                }
-            }
-        }
-    }
-
-     */
 
     LaunchedEffect(backStackEntry?.savedStateHandle) {
         val handle = backStackEntry?.savedStateHandle ?: return@LaunchedEffect
@@ -178,9 +157,8 @@ fun NewsFeedScreen(
                         }
                     }
 
-                    // Kombinovati sa postojećim vestima i ukloniti duplikate
-                    //val uniqueNews = (allNewNews + allNews).distinctBy { it.uuid } // ili neki drugi unique identifikator
-                    allNews = allNewNews + allNews
+                    val uniqueNews = (allNewNews + allNews).distinctBy { it.uuid }
+                    allNews = uniqueNews
 
                 } catch (e: Exception) {
                 } finally {
@@ -204,19 +182,38 @@ fun NewsFeedScreen(
         }
     }
 
+
+    /*
     val displayNews = remember(allNews, dateRangeFilter, unwantedWordsFilter) {
         allNews.filter { news ->
-            (dateRangeFilter?.let { range ->
-                val newsDate = parseDate(news.publishedDate)
-                val start = parseDate(range.first)
-                val end = parseDate(range.second)
-                newsDate in start..end
-            } ?: true) &&
+            (selectedCategory == "Sve" || news.category == selectedCategory) &&
+                    (dateRangeFilter?.let { range ->
+                        val newsDate = parseDate(news.publishedDate)
+                        val start = parseDate(range.first)
+                        val end = parseDate(range.second)
+                        newsDate in start..end
+                    } ?: true) &&
                     unwantedWordsFilter.none { word ->
                         news.title.contains(word, ignoreCase = true) ||
                                 news.snippet.contains(word, ignoreCase = true)
                     }
         }
+    }
+
+     */
+
+    val displayNews = allNews.filter { news ->
+        (selectedCategory == "Sve" || news.category == selectedCategory) &&
+                (dateRangeFilter?.let { range ->
+                    val newsDate = parseDate(news.publishedDate)
+                    val start = parseDate(range.first)
+                    val end = parseDate(range.second)
+                    newsDate in start..end
+                } ?: true) &&
+                unwantedWordsFilter.none { word ->
+                    news.title.contains(word, ignoreCase = true) ||
+                            news.snippet.contains(word, ignoreCase = true)
+                }
     }
 
     Scaffold { paddingValues ->

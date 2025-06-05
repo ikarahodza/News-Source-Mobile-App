@@ -157,9 +157,8 @@ object NewsService {
 
         try {
             val similarData = newsDAO.getSimilarStories(uuid)
-            //val similarItems = similarData.map { NewsItem.fromData(it) }
             val similarItems = similarData.map {
-                NewsItem.fromData(it).copy(isFeatured = true) // Označi kao featured
+                NewsItem.fromData(it).copy(isFeatured = true)
             }
 
 
@@ -173,8 +172,6 @@ object NewsService {
                 currentNews.addAll(0, newItems)
                 _allNews.value = currentNews
             }
-
-
 
             return similarItems
         } catch (e: Exception) {

@@ -1,7 +1,6 @@
 package etf.ri.rma.newsfeedapp.screen
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,10 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
-import etf.ri.rma.newsfeedapp.data.NewsService
-import etf.ri.rma.newsfeedapp.data.network.NewsDAO
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

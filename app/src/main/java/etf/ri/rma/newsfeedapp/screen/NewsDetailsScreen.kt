@@ -132,7 +132,6 @@ fun NewsDetailsScreen(
 
     BackHandler(onBack = onClose)
 
-
     when {
 
         error != null -> {
@@ -151,8 +150,6 @@ fun NewsDetailsScreen(
                 }
             }
         }
-
-
 
         currentNews != null -> {
             val news = currentNews!!
