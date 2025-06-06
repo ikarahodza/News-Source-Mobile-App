@@ -2,6 +2,7 @@ package etf.ri.rma.newsfeedapp.screen
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +30,16 @@ import etf.ri.rma.newsfeedapp.model.NewsItem
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import etf.ri.rma.newsfeedapp.data.NewsService
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Alignment
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -75,6 +81,7 @@ fun FilterSection(
         }
     }
 }
+
 
 @Composable
 fun NewsFeedScreen(
@@ -125,7 +132,6 @@ fun NewsFeedScreen(
             } else {
                 val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
                 val categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-                //allNews = categoryNews
 
                 val combinedNews = (categoryNews + allNews).distinctBy { it.uuid }
                 allNews = combinedNews
@@ -182,8 +188,6 @@ fun NewsFeedScreen(
         }
     }
 
-
-    /*
     val displayNews = remember(allNews, dateRangeFilter, unwantedWordsFilter) {
         allNews.filter { news ->
             (selectedCategory == "Sve" || news.category == selectedCategory) &&
@@ -200,8 +204,7 @@ fun NewsFeedScreen(
         }
     }
 
-     */
-
+    /*
     val displayNews = allNews.filter { news ->
         (selectedCategory == "Sve" || news.category == selectedCategory) &&
                 (dateRangeFilter?.let { range ->
@@ -215,6 +218,8 @@ fun NewsFeedScreen(
                             news.snippet.contains(word, ignoreCase = true)
                 }
     }
+
+     */
 
     Scaffold { paddingValues ->
         Column(
@@ -273,6 +278,10 @@ fun NewsList(
             }
         } else {
             items(newsItems) { newsItem ->
+                Log.d("NewsList", "Rendering: ${newsItem.title}")
+                Log.d("NewsList", "Image URL: ${newsItem.imageUrl}")
+                Log.d("NewsList", "Tags for ${newsItem.uuid}: ${newsItem.imageTags}")
+                
             if (newsItem.isFeatured) {
                     FeaturedNewsCard(
                         newsItem = newsItem,

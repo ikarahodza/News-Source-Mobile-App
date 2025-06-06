@@ -54,7 +54,6 @@ fun NewsDetailsScreen(
     var currentNews by remember { mutableStateOf<NewsItem?>(null) }
     val scrollState = rememberScrollState()
     val imagaDAO = remember { ImagaDAO() }
-    val coroutineScope = rememberCoroutineScope()
 
     var imageTags by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoadingTags by remember { mutableStateOf(false) }
@@ -107,13 +106,13 @@ fun NewsDetailsScreen(
             try {
                 newsItem.imageUrl?.let { url ->
                     val response = imagaDAO.getImageTags(url)
+                    Log.d("NewsDetailsScreen", "Rendering: ${newsItem.imageTags}")
                     imageTags = response.result.tags.map { it.tag.en }
                 }
             } catch (e: Exception) {
                 imageTags = emptyList()
             }
             isLoadingTags = false
-
 
         } catch (e: Exception){
         } finally {

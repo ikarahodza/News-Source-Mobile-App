@@ -28,6 +28,7 @@ import etf.ri.rma.newsfeedapp.R
 import etf.ri.rma.newsfeedapp.model.NewsItem
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import android.util.Log
 
 @Composable
 fun StandardNewsCard(
@@ -64,14 +65,21 @@ fun StandardNewsCard(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Image(
-                painter = painter,
+            Log.d("StandardNewsCard", "Rendering: ${newsItem.imageUrl}")
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(imageUrl)
+                    .placeholder(R.drawable.newsimg)
+                    .error(R.drawable.newsimg)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "News image",
                 modifier = Modifier
                     .width(120.dp)
                     .height(120.dp),
                 contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(
