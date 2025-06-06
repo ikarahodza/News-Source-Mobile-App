@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.foundation.layout.android)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

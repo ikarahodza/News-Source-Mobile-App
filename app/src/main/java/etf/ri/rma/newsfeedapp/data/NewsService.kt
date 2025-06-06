@@ -56,11 +56,12 @@ object NewsService {
         val apiCategory = mapUIToAPICategory(category)
         val currentTime = System.currentTimeMillis()
         val lastFetchTime = categoryTimestamps[category] ?: 0L
-        val needsRefresh = forceRefresh || (currentTime - lastFetchTime) >= 30_000
+        val needsRefresh = forceRefresh || (currentTime - lastFetchTime) >= 30000
+
+        Log.d("NewsService", "needsRefresh for category $category: $needsRefresh")
 
         try {
             if (needsRefresh) {
-
                 val topStories = newsDAO.getTopStoriesByCategory(apiCategory)
 
                 val featuredNewsItems = topStories.map { storyData ->

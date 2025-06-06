@@ -38,8 +38,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import etf.ri.rma.newsfeedapp.data.NewsService
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.max
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -124,6 +126,7 @@ fun NewsFeedScreen(
         }
     }
 
+        /*
     LaunchedEffect(selectedCategory) {
         isLoading = true
         try{
@@ -133,10 +136,143 @@ fun NewsFeedScreen(
                 val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
                 val categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
 
-                val combinedNews = (categoryNews + allNews).distinctBy { it.uuid }
-                allNews = combinedNews
+
+                val existingNonFeatured = allNews.filter {
+                    it.category == selectedCategory && !it.isFeatured
+                }
+                allNews = (categoryNews + existingNonFeatured)
+                    .distinctBy { it.uuid }
+                    .sortedByDescending { it.isFeatured }
             }
         } catch(e: Exception){
+            allNews = emptyList()
+        } finally {
+            isLoading = false
+        }
+    }
+
+         */
+
+    var lastInteractionTime by remember { mutableStateOf(System.currentTimeMillis()) }
+    var lastRefreshTime by remember { mutableStateOf(0L) }
+
+    /*
+    LaunchedEffect(selectedCategory) {
+        isLoading = true
+        try {
+            if (selectedCategory == "Sve") {
+                allNews = NewsService.getAllNews()
+                lastFetchTime = System.currentTimeMillis()
+            } else {
+                val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
+                val currentTime = System.currentTimeMillis()
+                val needsRefresh = (currentTime - lastFetchTime) >= 30000
+
+                Log.d("NewsFeed", "needsRefresh for $selectedCategory: $needsRefresh")
+
+                var categoryNews = if (needsRefresh) {
+                    NewsService.getNewsByCategory(apiCategory, forceRefresh = true).also {
+                        lastFetchTime = System.currentTimeMillis()
+                    }
+                } else {
+                    NewsService.getNewsByCategory(apiCategory)
+                }
+
+                val existingNonFeatured = allNews.filter {
+                    it.category == selectedCategory && !it.isFeatured
+                }
+
+                allNews = (categoryNews + existingNonFeatured)
+                    .distinctBy { it.uuid }
+                    .sortedByDescending { it.isFeatured }
+
+                while (selectedCategory != "Sve") {
+                    val timeSinceLastInteraction = System.currentTimeMillis() - lastInteractionTime
+                    val remainingTime = max(0, 30000 - timeSinceLastInteraction)
+
+                    delay(remainingTime)
+
+                    if (selectedCategory != "Sve" &&
+                        System.currentTimeMillis() - lastInteractionTime >= 30000) {
+
+                        Log.d("NewsFeed", "Auto-refreshing $selectedCategory after 30s inactivity")
+
+                        categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
+                            .also { lastFetchTime = System.currentTimeMillis() }
+
+                        val updatedNonFeatured = allNews.filter {
+                            it.category == selectedCategory && !it.isFeatured
+                        }
+
+                        allNews = (categoryNews + updatedNonFeatured)
+                            .distinctBy { it.uuid }
+                            .sortedByDescending { it.isFeatured }
+
+                        lastInteractionTime = System.currentTimeMillis()
+                    }
+                }
+            }
+        } catch(e: Exception) {
+            Log.e("NewsFeed", "Error loading news", e)
+            allNews = emptyList()
+        } finally {
+            isLoading = false
+        }
+    }
+
+     */
+
+    LaunchedEffect(selectedCategory) {
+        isLoading = true
+        try {
+            if (selectedCategory == "Sve") {
+                allNews = NewsService.getAllNews()
+                lastRefreshTime = System.currentTimeMillis()
+            } else {
+                val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
+                var categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
+
+                val existingNonFeatured = allNews.filter {
+                    it.category == selectedCategory && !it.isFeatured
+                }
+
+                allNews = (categoryNews + existingNonFeatured)
+                    .distinctBy { it.uuid }
+                    .sortedByDescending { it.isFeatured }
+
+                lastRefreshTime = System.currentTimeMillis()
+                lastInteractionTime = System.currentTimeMillis()
+
+                while (selectedCategory != "Sve") {
+                    val currentTime = System.currentTimeMillis()
+                    val timeSinceInteraction = currentTime - lastInteractionTime
+                    val timeSinceRefresh = currentTime - lastRefreshTime
+
+                    val remainingTime = max(30000 - timeSinceInteraction, 30000 - timeSinceRefresh)
+                    val delayTime = max(0, remainingTime)
+
+                    delay(delayTime)
+
+                    if (selectedCategory != "Sve" &&
+                        System.currentTimeMillis() - lastInteractionTime >= 30000 &&
+                        System.currentTimeMillis() - lastRefreshTime >= 30000) {
+
+                        categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
+
+                        val updatedNonFeatured = allNews.filter {
+                            it.category == selectedCategory && !it.isFeatured
+                        }
+
+                        allNews = (categoryNews + updatedNonFeatured)
+                            .distinctBy { it.uuid }
+                            .sortedByDescending { it.isFeatured }
+
+                        lastRefreshTime = System.currentTimeMillis()
+                        lastInteractionTime = System.currentTimeMillis()
+                    }
+                }
+            }
+        } catch(e: Exception) {
             allNews = emptyList()
         } finally {
             isLoading = false
@@ -174,20 +310,6 @@ fun NewsFeedScreen(
         }
     }
 
-    val filteredNews = remember(selectedCategory, dateRangeFilter, unwantedWordsFilter) {
-        allNews.filter { news ->
-            (selectedCategory == "Sve" || news.category == selectedCategory) && (dateRangeFilter?.let { range ->
-                val newsDate = parseDate(news.publishedDate)
-                val start = parseDate(range.first)
-                val end = parseDate(range.second)
-                newsDate in start..end
-            } ?: true) &&
-            unwantedWordsFilter.none { word ->
-                news.title.contains(word, ignoreCase = true) || news.snippet.contains(word, ignoreCase = true)
-            }
-        }
-    }
-
     val displayNews = remember(allNews, dateRangeFilter, unwantedWordsFilter) {
         allNews.filter { news ->
             (selectedCategory == "Sve" || news.category == selectedCategory) &&
@@ -203,23 +325,6 @@ fun NewsFeedScreen(
                     }
         }
     }
-
-    /*
-    val displayNews = allNews.filter { news ->
-        (selectedCategory == "Sve" || news.category == selectedCategory) &&
-                (dateRangeFilter?.let { range ->
-                    val newsDate = parseDate(news.publishedDate)
-                    val start = parseDate(range.first)
-                    val end = parseDate(range.second)
-                    newsDate in start..end
-                } ?: true) &&
-                unwantedWordsFilter.none { word ->
-                    news.title.contains(word, ignoreCase = true) ||
-                            news.snippet.contains(word, ignoreCase = true)
-                }
-    }
-
-     */
 
     Scaffold { paddingValues ->
         Column(
@@ -269,7 +374,8 @@ fun NewsList(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier.testTag("news_list"),
+        modifier = modifier
+            .testTag("news_list"),
         state = rememberLazyListState()
     ) {
         if (newsItems.isEmpty()) {
@@ -278,9 +384,6 @@ fun NewsList(
             }
         } else {
             items(newsItems) { newsItem ->
-                Log.d("NewsList", "Rendering: ${newsItem.title}")
-                Log.d("NewsList", "Image URL: ${newsItem.imageUrl}")
-                Log.d("NewsList", "Tags for ${newsItem.uuid}: ${newsItem.imageTags}")
                 
             if (newsItem.isFeatured) {
                     FeaturedNewsCard(
