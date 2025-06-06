@@ -2,7 +2,6 @@ package etf.ri.rma.newsfeedapp.data
 
 import android.util.Log
 import etf.ri.rma.newsfeedapp.data.network.ImagaDAO
-import etf.ri.rma.newsfeedapp.data.network.NewsDAO
 import etf.ri.rma.newsfeedapp.model.NewsItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -122,35 +121,6 @@ object NewsService {
         }.sortedByDescending { it.isFeatured }
     }
 
-    /*
-    suspend fun getSimilarStories(uuid: String): List<NewsItem> {
-        try {
-            val similarData = newsDAO.getSimilarStories(uuid)
-            val similarItems = similarData.map { NewsItem.fromData(it) }
-
-            similarStoriesCache[uuid] = similarItems
-            return similarItems
-        } catch (e: Exception) {
-            Log.e("NewsService", "Error fetching similar stories: ${e.message}", e)
-
-            if (similarStoriesCache.containsKey(uuid)) {
-                return similarStoriesCache[uuid]!!
-            }
-
-            val story = _allNews.value.find { it.uuid == uuid }
-            return if (story != null) {
-                _allNews.value.filter {
-                    it.uuid != uuid && it.category.any { cat ->
-                        story.category.contains(cat)
-                    }
-                }.take(2)
-            } else {
-                emptyList()
-            }
-        }
-    }
-
-     */
     suspend fun getSimilarStories(uuid: String): List<NewsItem> {
         if (similarStoriesCache.containsKey(uuid)) {
             return similarStoriesCache[uuid]!!
