@@ -65,8 +65,8 @@ class RetrofitInstanceNews {
 class RetrofitInstanceImaga {
     companion object {
         private const val BASE_URL = "https://api.imagga.com/"
-        private const val IMAGA_API_KEY = "acc_8d430a23259f9d6"
-        private const val IMAGA_API_SECRET = "d9a909e11a3e8e0cfd196880af55ac6f"
+        private const val IMAGA_API_KEY = "acc_1f155786164843c"
+        private const val IMAGA_API_SECRET = "32fde55dc7ab1c27b88197a5a834cb03"
 
         private val okHttpClient by lazy {
             OkHttpClient.Builder()

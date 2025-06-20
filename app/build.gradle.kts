@@ -91,6 +91,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-tls:4.12.0") // For TLS features like HeldCertificate
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
+    kapt("androidx.room:room-compiler:2.7.1")
 }
 
 configurations.all {

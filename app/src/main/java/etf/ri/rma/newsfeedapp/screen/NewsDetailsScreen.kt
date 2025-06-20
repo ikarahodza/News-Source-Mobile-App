@@ -1,5 +1,7 @@
 package etf.ri.rma.newsfeedapp.screen
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -8,16 +10,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -37,11 +42,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import etf.ri.rma.newsfeedapp.model.NewsItem
 import coil.compose.AsyncImage
+import etf.ri.rma.newsfeedapp.data.NewsDatabase
 import etf.ri.rma.newsfeedapp.data.NewsService
 import etf.ri.rma.newsfeedapp.data.NewsService.allNews
 import etf.ri.rma.newsfeedapp.data.network.ImagaDAO
+import etf.ri.rma.newsfeedapp.data.network.toDomain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.compose.foundation.layout.size
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -54,20 +66,93 @@ fun NewsDetailsScreen(
     var currentNews by remember { mutableStateOf<NewsItem?>(null) }
     val scrollState = rememberScrollState()
     val imagaDAO = remember { ImagaDAO() }
-
     var imageTags by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoadingTags by remember { mutableStateOf(false) }
     var isLoading by remember {mutableStateOf(true)}
     var error by remember { mutableStateOf<String?>(null) }
-
     var relatedNews by remember { mutableStateOf<List<NewsItem>>(emptyList()) }
     val fetchedSimilarFor = remember { mutableStateMapOf<String, Boolean>() }
 
+    val context = LocalContext.current
+    val savedNewsDao = NewsDatabase.getInstance(context).savedNewsDAO()
+
+    val isOnline = remember {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.activeNetworkInfo?.isConnectedOrConnecting == true
+    }
+
+    suspend fun fetchNewsById(uuid: String): NewsItem? {
+        return if(isOnline) {
+            try {
+                NewsService.getNewsById(uuid)
+            } catch(e:Exception) {
+                savedNewsDao.getNewsById(uuid)?.toDomain()
+            }
+        } else {
+            savedNewsDao.getNewsById(uuid)?.toDomain()
+        }
+    }
+
+    suspend fun fetchSimilarNews(newsItem: NewsItem): List<NewsItem> {
+        return if (isOnline) {
+            try {
+                val similar = NewsService.getSimilarStories(newsItem.uuid)
+
+                similar.forEach { item ->
+                    try {
+                        val saved = savedNewsDao.saveNews(item)
+                        if(saved && item.imageTags.isNotEmpty()) {
+                            savedNewsDao.getNewsById(item.uuid)?.id?.let {
+                                id -> savedNewsDao.addTags(item.imageTags, id)
+                            }
+                        }
+                    } catch(e: Exception) {
+
+                    }
+                }
+                similar
+            } catch(e:Exception) {
+                savedNewsDao.getNewsWithCategory(newsItem.category).filter { it.uuid != newsItem.uuid}
+            }
+        } else {
+            savedNewsDao.getNewsWithCategory(newsItem.category).filter { it.uuid != newsItem.uuid }
+        }
+    }
+
+    suspend fun fetchImageTags(newsItem: NewsItem): List<String> {
+        Log.d("NewsDetails", "Fetchanje tagova")
+        val newsExists = savedNewsDao.saveNews(newsItem)
+        val dbId = savedNewsDao.getNewsIdByUuid(newsItem.uuid)
+
+        val cached = dbId?.let { savedNewsDao.getTags(it)} ?: emptyList()
+
+        if(cached.isNotEmpty()) {
+            return cached
+        }
+
+        if(isOnline && !newsItem.imageUrl.isNullOrEmpty()) {
+            return try {
+                val response = imagaDAO.getImageTags(newsItem.imageUrl)
+                val tags = response.result.tags.map {it.tag.en}
+
+                if(tags.isNotEmpty() && dbId != null) {
+                    savedNewsDao.addTags(tags, dbId)
+                }
+                Log.d("NewsDetails", "Fetchani tagovi")
+                tags
+            } catch (e:Exception) {
+                emptyList()
+            }
+        }
+        return emptyList()
+    }
 
     LaunchedEffect(newsId) {
         isLoading = true
         try {
-            val newsItem = NewsService.getNewsById(newsId)
+            //val newsItem = NewsService.getNewsById(newsId)
+
+            val newsItem = fetchNewsById(newsId)
             if (newsItem == null) {
                 return@LaunchedEffect
             }
@@ -77,7 +162,9 @@ fun NewsDetailsScreen(
                 Log.d("NewsDetailsScreen", "Pokrenut LaunchedEffect za $newsId")
                 if (fetchedSimilarFor[newsId] != true) {
                     try {
-                        relatedNews = NewsService.getSimilarStories(newsId)
+                        //relatedNews = NewsService.getSimilarStories(newsId)
+                        val similar = fetchSimilarNews(newsItem)
+                        relatedNews = similar.take(2)
                         fetchedSimilarFor[newsId] = true
 
                         val updatedList = allNews.value.toMutableList()
@@ -104,11 +191,17 @@ fun NewsDetailsScreen(
 
             isLoadingTags = true
             try {
+                /*
                 newsItem.imageUrl?.let { url ->
                     val response = imagaDAO.getImageTags(url)
                     Log.d("NewsDetailsScreen", "Rendering: ${newsItem.imageTags}")
                     imageTags = response.result.tags.map { it.tag.en }
                 }
+                 */
+                savedNewsDao.saveNews(newsItem)
+
+                val tags = fetchImageTags(newsItem)
+                imageTags = tags
             } catch (e: Exception) {
                 imageTags = emptyList()
             }
@@ -123,7 +216,6 @@ fun NewsDetailsScreen(
     BackHandler(onBack = onClose)
 
     when {
-
         error != null -> {
             Box(modifier = Modifier.fillMaxSize()){
                 Column(
@@ -223,7 +315,6 @@ fun NewsDetailsScreen(
                     )
                 }
 
-
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
@@ -269,13 +360,13 @@ fun NewsDetailsScreen(
                 }
             }
         }
-
         else -> {
             Text("Nepoznata greška")
         }
     }
-
 }
+
+
 
 fun parseDate(dateString: String): Date {
     val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())

@@ -1,5 +1,7 @@
 package etf.ri.rma.newsfeedapp.screen
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +40,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import etf.ri.rma.newsfeedapp.data.NewsService
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import etf.ri.rma.newsfeedapp.data.NewsDatabase
+import etf.ri.rma.newsfeedapp.data.network.NewsWithTags
+import etf.ri.rma.newsfeedapp.data.network.SavedNewsDAO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.max
@@ -102,6 +112,64 @@ fun NewsFeedScreen(
     val backStackEntryState = navController?.currentBackStackEntryAsState()
     val backStackEntry = backStackEntryState?.value
 
+    val context = LocalContext.current
+    val savedNewsDao = NewsDatabase.getInstance(context).savedNewsDAO()
+
+    val isOnline = remember {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.activeNetworkInfo?.isConnectedOrConnecting == true
+    }
+
+    fun syncToDatabase(news: List<NewsItem>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            news.forEach {item ->
+                val inserted = savedNewsDao.saveNews(item)
+                if(inserted) {
+                    val dbId = savedNewsDao.getNewsById(item.uuid)?.id ?: return@forEach
+                    savedNewsDao.addTags(item.imageTags, dbId)
+                }
+            }
+        }
+    }
+
+    suspend fun fetchNewsFromDatabase(category: String = "Sve"): List<NewsItem> {
+        return try {
+            if(category == "Sve") {
+                savedNewsDao.allNews()
+            } else {
+                savedNewsDao.getNewsWithCategory(category)
+            }
+        } catch (e: Exception) {
+            Log.e("NewsFeedScreen", "Error pri pozivanju remote servisa: ${e.message}")
+            emptyList()
+        }
+
+    }
+
+    //ne pozivaju mi se getallnews pri pokretanju aplikacije
+    suspend fun fetchNews(category: String = "Sve", forceRefresh: Boolean = false): List<NewsItem> {
+        allNews = NewsService.getAllNews()
+
+        return if(isOnline) {
+            try {
+                val remote = if(category == "Sve") {
+                    allNews
+                } else {
+                    val fromCat = NewsService.getNewsByCategory(NewsService.mapAPIToUICategory(category), forceRefresh = forceRefresh)
+                    allNews + fromCat
+                }
+                syncToDatabase(remote)
+                remote
+            } catch(e: Exception) {
+                Log.e("NewsFeedScreen", "Error pri pozivanju remote servisa: ${e.message}")
+                fetchNewsFromDatabase(category)
+            }
+        } else {
+            val fromDb = fetchNewsFromDatabase(category)
+            allNews + fromDb
+        }
+    }
+
     LaunchedEffect(backStackEntry) {
         backStackEntry?.savedStateHandle?.remove<String>("filteredCategory")?.let {
             selectedCategory = it
@@ -117,10 +185,7 @@ fun NewsFeedScreen(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            newsDAO.ensureInitialDataLoaded()
-            allNews = NewsService.getAllNews()
-        } catch (e: Exception) {
-            allNews = emptyList()
+            allNews = fetchNews()
         } finally {
             isLoading = false
         }
@@ -132,55 +197,7 @@ fun NewsFeedScreen(
     LaunchedEffect(selectedCategory) {
         isLoading = true
         try {
-            if (selectedCategory == "Sve") {
-                allNews = NewsService.getAllNews()
-                lastRefreshTime = System.currentTimeMillis()
-            } else {
-                val apiCategory = NewsService.mapAPIToUICategory(selectedCategory)
-                var categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-
-                val existingNonFeatured = allNews.filter {
-                    it.category == selectedCategory && !it.isFeatured
-                }
-
-                allNews = (categoryNews + existingNonFeatured)
-                    .distinctBy { it.uuid }
-                    .sortedByDescending { it.isFeatured }
-
-                lastRefreshTime = System.currentTimeMillis()
-                lastInteractionTime = System.currentTimeMillis()
-
-                while (selectedCategory != "Sve") {
-                    val currentTime = System.currentTimeMillis()
-                    val timeSinceInteraction = currentTime - lastInteractionTime
-                    val timeSinceRefresh = currentTime - lastRefreshTime
-
-                    val remainingTime = max(30000 - timeSinceInteraction, 30000 - timeSinceRefresh)
-                    val delayTime = max(0, remainingTime)
-
-                    delay(delayTime)
-
-                    if (selectedCategory != "Sve" &&
-                        System.currentTimeMillis() - lastInteractionTime >= 30000 &&
-                        System.currentTimeMillis() - lastRefreshTime >= 30000) {
-
-                        categoryNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-
-                        val updatedNonFeatured = allNews.filter {
-                            it.category == selectedCategory && !it.isFeatured
-                        }
-
-                        allNews = (categoryNews + updatedNonFeatured)
-                            .distinctBy { it.uuid }
-                            .sortedByDescending { it.isFeatured }
-
-                        lastRefreshTime = System.currentTimeMillis()
-                        lastInteractionTime = System.currentTimeMillis()
-                    }
-                }
-            }
-        } catch(e: Exception) {
-            allNews = emptyList()
+            allNews = fetchNews(selectedCategory, forceRefresh = true)
         } finally {
             isLoading = false
         }
@@ -196,13 +213,15 @@ fun NewsFeedScreen(
                 val clickedCategories = handle.get<List<String>>("clickedCategories") ?: emptyList()
 
                 isLoading = true
-                try { val allNewNews = mutableListOf<NewsItem>()
+                try {
+                    val allNewNews = mutableListOf<NewsItem>()
 
                     for (category in clickedCategories) {
                         if (category != "Sve") {
-                            val apiCategory = NewsService.mapAPIToUICategory(category)
-                            val newNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
-                            allNewNews.addAll(newNews)
+                            //val apiCategory = NewsService.mapAPIToUICategory(category)
+                            //val newNews = NewsService.getNewsByCategory(apiCategory, forceRefresh = true)
+                            val categoryNews = fetchNews(category, forceRefresh = true)
+                            allNewNews.addAll(categoryNews)
                         }
                     }
 
@@ -306,3 +325,28 @@ fun NewsList(
         }
     }
 }
+
+/*
+private suspend fun syncIntoDb(news: List<NewsItem>, dao: SavedNewsDAO) {
+    withContext(Dispatchers.IO) {
+        news.forEach { item ->
+            if (dao.saveNews(item)) {
+                dao.addTags(item.imageTags, item.uuid) // pretpostavka: item.id dobijen iz saveNews
+            }
+        }
+    }
+}
+
+ */
+
+fun NewsWithTags.toDomain() = NewsItem(
+    uuid        = news.uuid,
+    title       = news.title,
+    snippet     = news.content,
+    imageUrl    = news.imageUrl,
+    category    = news.category,
+    source      = news.source,
+    publishedDate = news.date,
+    imageTags   = tags.map { it.value },
+    isFeatured  = false
+)

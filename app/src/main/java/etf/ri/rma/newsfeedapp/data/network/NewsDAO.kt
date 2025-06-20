@@ -220,7 +220,7 @@ class NewsDAO {
     }
 
 
-    suspend fun getSimilarStories(uuid: String): List<Data> = withContext(Dispatchers.IO) {
+   /* suspend fun getSimilarStories(uuid: String): List<Data> = withContext(Dispatchers.IO) {
         if (!isValidUUID(uuid)) {
             throw InvalidUUIDException("Invalid UUID: $uuid")
         }
@@ -255,6 +255,44 @@ class NewsDAO {
                 }.take(2)
             }
             return@withContext emptyList()
+        }
+    }
+
+    */
+
+    suspend fun getSimilarStories(uuid: String): List<Data> = withContext(Dispatchers.IO) {
+        if (!isValidUUID(uuid)) {
+            throw InvalidUUIDException("Invalid UUID: $uuid")
+        }
+
+        if (similarStoriesCache.containsKey(uuid)) {
+            Log.d("NewsDAO", "Nađen u kešu za $uuid")
+            return@withContext similarStoriesCache[uuid]!!
+        }
+
+        return@withContext try {
+            val response = apiService.getSimilarStories(
+                uuid = uuid,
+                limit = 2,
+                apiToken = API_TOKEN
+            )
+            val similarStories = response.data
+            Log.d("NewsDAO", "API vratio ${similarStories.size} vijesti")
+
+            similarStoriesCache[uuid] = similarStories
+            similarStories
+        } catch (e: Exception) {
+            Log.e("NewsDAO", "Greška prilikom poziva API-ja: ${e.message}", e)
+
+            val story = allStoriesCache.find { it.uuid == uuid }
+            if (story != null) {
+                val category = story.categories.firstOrNull() ?: "general"
+                allStoriesCache.filter {
+                    it.uuid != uuid && it.categories.contains(category)
+                }.take(2)
+            } else {
+                emptyList()
+            }
         }
     }
 

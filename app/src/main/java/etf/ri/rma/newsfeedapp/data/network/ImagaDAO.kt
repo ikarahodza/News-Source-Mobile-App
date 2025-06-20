@@ -38,6 +38,7 @@ class ImagaDAO {
             imageTagsCache[imageUrl] = response
             return@withContext response
         } catch (e: Exception) {
+            Log.e("ImagaDAO", "Greška pri dohvatu tagova", e)
             return@withContext emptyResponse
         }
     }
