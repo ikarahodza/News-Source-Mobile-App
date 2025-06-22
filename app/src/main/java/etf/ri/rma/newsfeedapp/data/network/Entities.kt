@@ -8,7 +8,7 @@ import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-
+/*
 @Entity(tableName = "News")
 data class NewsEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -30,15 +30,15 @@ data class TagEntity(
 
 @Entity(
     tableName = "NewsTags",
-    primaryKeys = ["newsId", "tagId"],
+    primaryKeys = ["newsId", "tagsId"],
     foreignKeys = [
         ForeignKey(entity = NewsEntity::class, parentColumns = ["id"], childColumns = ["newsId"]),
-        ForeignKey(entity = TagEntity::class, parentColumns = ["id"], childColumns = ["tagId"])
+        ForeignKey(entity = TagEntity::class, parentColumns = ["id"], childColumns = ["tagsId"])
     ],
-    indices = [Index("newsId"), Index("tagId")]
+    indices = [Index("newsId"), Index("tagsId")]
 ) data class NewsTagsCrossRef(
     var newsId: Int,
-    var tagId: Int
+    var tagsId: Int
 )
 
 
@@ -50,10 +50,12 @@ data class NewsWithTags(
         associateBy = Junction(
             value = NewsTagsCrossRef::class,
             parentColumn = "newsId",
-            entityColumn = "tagId"
+            entityColumn = "tagsId"
         )
     )
     var tags: List<TagEntity>
 )
 
+
+ */
 

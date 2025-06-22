@@ -196,6 +196,7 @@ object NewsService {
     }
 
     public fun mapUIToAPICategory(category: String): String {
+        Log.d("CATEGORY_MAP", "Mapping '$category'")
         return when (category) {
             "Politika" -> "politics"
             "Sport" -> "sports"

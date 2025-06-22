@@ -4,14 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import etf.ri.rma.newsfeedapp.data.network.NewsEntity
-import etf.ri.rma.newsfeedapp.data.network.NewsTagsCrossRef
-import etf.ri.rma.newsfeedapp.data.network.SavedNewsDAO
-import etf.ri.rma.newsfeedapp.data.network.TagEntity
+import etf.ri.rma.newsfeedapp.model.News
+import etf.ri.rma.newsfeedapp.model.NewsTags
+import etf.ri.rma.newsfeedapp.model.Tags
 
 @Database (
-    entities = [NewsEntity::class, TagEntity::class, NewsTagsCrossRef::class],
-    version = 3,
+    entities = [News::class, Tags::class, NewsTags::class],
+    version = 5,
     exportSchema = false
 )
 abstract class  NewsDatabase : RoomDatabase() {

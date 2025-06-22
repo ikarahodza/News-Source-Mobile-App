@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TestS3">
+      <SelectionState runConfigName="a02_insertNews()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testImagga()">
+      <SelectionState runConfigName="a03_allNews()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testIfCacheingWorks()">
+      <SelectionState runConfigName="a04_insertAnotherAndCheckSize()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testIfCacheingWorks2()">
+      <SelectionState runConfigName="TestS4">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testImaggaFailed()">
+      <SelectionState runConfigName="a11_allNewsGetsTags()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

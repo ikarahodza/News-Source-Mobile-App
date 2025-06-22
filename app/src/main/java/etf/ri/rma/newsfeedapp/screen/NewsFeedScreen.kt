@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
@@ -32,26 +31,16 @@ import etf.ri.rma.newsfeedapp.model.NewsItem
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import etf.ri.rma.newsfeedapp.data.NewsService
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import etf.ri.rma.newsfeedapp.data.NewsDatabase
-import etf.ri.rma.newsfeedapp.data.network.NewsWithTags
-import etf.ri.rma.newsfeedapp.data.network.SavedNewsDAO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Locale
-import kotlin.math.max
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -339,14 +328,3 @@ private suspend fun syncIntoDb(news: List<NewsItem>, dao: SavedNewsDAO) {
 
  */
 
-fun NewsWithTags.toDomain() = NewsItem(
-    uuid        = news.uuid,
-    title       = news.title,
-    snippet     = news.content,
-    imageUrl    = news.imageUrl,
-    category    = news.category,
-    source      = news.source,
-    publishedDate = news.date,
-    imageTags   = tags.map { it.value },
-    isFeatured  = false
-)

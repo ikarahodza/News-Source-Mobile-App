@@ -89,7 +89,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:okhttp-tls:4.12.0") // For TLS features like HeldCertificate
+    implementation("com.squareup.okhttp3:okhttp-tls:4.12.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     kapt("androidx.room:room-compiler:2.7.1")

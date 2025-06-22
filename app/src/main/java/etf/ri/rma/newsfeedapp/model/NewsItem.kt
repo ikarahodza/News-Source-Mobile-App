@@ -1,9 +1,8 @@
 package etf.ri.rma.newsfeedapp.model
 
 import androidx.room.Ignore
+import coil.request.Tags
 import etf.ri.rma.newsfeedapp.data.network.Data
-import etf.ri.rma.newsfeedapp.data.network.NewsEntity
-import etf.ri.rma.newsfeedapp.data.network.NewsWithTags
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -71,27 +70,16 @@ data class NewsItem(
     }
 }
 
-fun NewsItem.toEntity() = NewsEntity(
-    uuid = uuid,
-    title = title,
-    content = snippet,
-    category = category,
-    date = publishedDate,
-    imageUrl = imageUrl,
-    source = source,
-    isFeatured = isFeatured
-)
-
 fun NewsWithTags.toDomain(): NewsItem =
     NewsItem(
         uuid          = news.uuid,
         title         = news.title,
-        snippet       = news.content,
+        snippet       = news.snippet,
         imageUrl      = null,                       // ili news.imageUrl ako ga čuvaš
         category      = news.category,
         isFeatured    = false,                      // postavi po svom pravilu
         source        = "",                         // popuni ako imaš source u entitetu
-        publishedDate = news.date,
+        publishedDate = news.publishedDate,
         imageTags     = tags.map { it.value }
     )
 
