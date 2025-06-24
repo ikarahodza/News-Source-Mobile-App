@@ -32,7 +32,6 @@ data class Tags(
 
 @Entity(
     tableName = "NewsTags",
-    //primaryKeys = ["newsId", "tagsId"],
     foreignKeys = [
         ForeignKey(entity = News::class, parentColumns = ["id"], childColumns = ["newsId"]),
         ForeignKey(entity = Tags::class, parentColumns = ["id"], childColumns = ["tagsId"])

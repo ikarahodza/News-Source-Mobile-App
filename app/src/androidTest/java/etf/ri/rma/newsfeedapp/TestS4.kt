@@ -180,7 +180,7 @@ class TestS4 {
     }
 
 
-    /*
+
     @Test
     fun a11_allNewsGetsTags() = runTest {
         var allnews = savedNewsDAO.allNews().find { it.imageTags.find { it.value =="prva"}!=null}
@@ -189,7 +189,7 @@ class TestS4 {
         assertThat(allnews.imageTags, not(hasItems(hasText("prva"))))
     }
 
-     */
+
 
     @Test
     fun a12_getSimilar() = runTest {

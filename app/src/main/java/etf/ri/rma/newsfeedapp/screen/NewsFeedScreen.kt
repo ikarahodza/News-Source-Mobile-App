@@ -115,7 +115,7 @@ fun NewsFeedScreen(
                 val inserted = savedNewsDao.saveNews(item)
                 if(inserted) {
                     val dbId = savedNewsDao.getNewsById(item.uuid)?.id ?: return@forEach
-                    savedNewsDao.addTags(item.imageTags, dbId)
+                    savedNewsDao.addTags(item.imageTags.map { it.value }, dbId)
                 }
             }
         }

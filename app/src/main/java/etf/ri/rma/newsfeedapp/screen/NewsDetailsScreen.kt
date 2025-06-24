@@ -95,7 +95,8 @@ fun NewsDetailsScreen(
                         val saved = savedNewsDao.saveNews(item)
                         if(saved && item.imageTags.isNotEmpty()) {
                             savedNewsDao.getNewsById(item.uuid)?.id?.let {
-                                id -> savedNewsDao.addTags(item.imageTags, id)
+                                id ->savedNewsDao.addTags(item.imageTags.map { it.value }, id)
+
                             }
                         }
                     } catch(e: Exception) {

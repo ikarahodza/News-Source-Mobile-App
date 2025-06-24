@@ -28,8 +28,11 @@ interface SavedNewsDAO {
     @Query("SELECT * FROM News WHERE category = :category")
     suspend fun newsWithCategory(category: String): List<News>
 
+    /*
     suspend fun getNewsWithCategory(category: String): List<NewsItem> =
         newsWithCategory(category).map { it.toDomain() }
+
+     */
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNews(news: News): Long
@@ -58,8 +61,6 @@ interface SavedNewsDAO {
     suspend fun getSimilarNewsRaw(tags: List<String>): List<NewsWithTags>
 
 
-
-
     @Transaction
     @Query("""
         SELECT Tags.value FROM Tags 
@@ -79,30 +80,6 @@ interface SavedNewsDAO {
     @Query("SELECT Tags.value FROM Tags")
     suspend fun getAllTags() : List<String>
 
-    /*
-    @Transaction
-    suspend fun saveNews(news: NewsItem): Boolean =
-        insertNews(news.toEntity()) != -1L
-
-    suspend fun saveNews(item: NewsItem): Boolean {
-        if (loadAllNews().any { it.uuid == item.uuid }) return false
-        insertNews(
-            NewsEntity(
-                uuid = item.uuid,
-                title = item.title,
-                content = item.snippet,
-                source = item.source,
-                date = item.publishedDate,
-                imageUrl = item.imageUrl,
-                category = item.category,
-                isFeatured = item.isFeatured
-            )
-        )
-        return true
-    }
-
-     */
-
     suspend fun saveNews(news: NewsItem): Boolean {
         if (getNewsById(news.uuid) != null) return false
         val mappedNews = news.toEntity()
@@ -113,25 +90,6 @@ interface SavedNewsDAO {
 
     @Query("SELECT id FROM News WHERE uuid = :uuid LIMIT 1")
     suspend fun getNewsIdByUuid(uuid: String): Int?
-
-    /*
-    @Transaction
-    suspend fun addTags(tags: List<String>, newsId: Int): Int {
-        var newTagCount = 0
-        val existing = getExistingTags(tags).associateBy { it.value }
-
-        for (tag in tags) {
-            val tagId = existing[tag]?.id ?: run {
-                val newId = insertTag(TagEntity(value = tag)).toInt()
-                if (newId > 0) newTagCount++
-                newId
-            }
-            insertNewsTagCrossRef(NewsTagsCrossRef(newsId, tagId))
-        }
-        return newTagCount
-    }
-
-     */
 
     @Transaction
     suspend fun addTags(tags: List<String>, newsId: Int): Int {
@@ -155,42 +113,42 @@ interface SavedNewsDAO {
         return newTagCount
     }
 
+    @Transaction
+    @Query("""
+        SELECT Tags.* FROM Tags 
+        INNER JOIN NewsTags ON Tags.id = NewsTags.tagsId 
+        WHERE NewsTags.newsId = :newsId
+    """)
+    suspend fun getTagsFull(newsId: Int): List<Tags>
 
     suspend fun allNews(): List<NewsItem> =
-        loadAllNews().map { news ->
-            val tags = getTags(news.id) // Ovo mora biti implementirano
-            news.toDomain().copy(imageTags = tags)
+        loadAllNewsWithTags().map { newsWithTags ->
+            toNewsItem(newsWithTags.news, newsWithTags.tags)
+        }
+
+    suspend fun getSimilarNews(tags: List<String>): List<NewsItem> {
+        val firstTwo = tags.take(2)
+        return getSimilarNewsRaw(firstTwo).map { rel ->
+            toNewsItem(rel.news, rel.tags)
+        }
+    }
+
+    suspend fun getNewsWithCategory(category: String): List<NewsItem> =
+        newsWithCategory(category).map { news ->
+            val tags = getTagsFull(news.id)
+            toNewsItem(news, tags)
         }
 
 
     /*
-    suspend fun allNews(): List<NewsItem>  {
-        val newsWithTags = loadAllNewsWithTags()
-        return newsWithTags.map { newsWithTag ->
-            toNewsItem(newsWithTag.news, newsWithTag.tags.map { it.value })
-        }
-    }
-
-    suspend fun getSimilarNews(tags: List<String>): List<NewsItem> {
-        val newsList = getSimilarNewsRaw(tags)
-        return newsList.map { news ->
-            val tagList = getTags(news.id)
-            NewsItem(
-                uuid = news.uuid,
-                title = news.title,
-                snippet = news.content,
-                category = news.category,
-                source = news.source,
-                publishedDate = news.date,
-                imageUrl = news.imageUrl,
-                isFeatured = false,
-                imageTags = tagList
-            )
-        }
-    }
+        suspend fun allNews(): List<NewsItem> =
+            loadAllNewsWithTags().map { news ->
+                val tags = getTagsFull(news.id)
+                toNewsItem(news, tags)
+            }
 
 
-     */
+
     suspend fun getSimilarNews(tags: List<String>): List<NewsItem> {
         val firstTwo = tags.take(2)
         return getSimilarNewsRaw(firstTwo).map { rel ->
@@ -199,50 +157,9 @@ interface SavedNewsDAO {
     }
 
 
-}
-
-
-
-/*
-@Dao
-interface SavedNewsDAO {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insert(news: NewsEntity): Long
-
-    @Query("SELECT * FROM News")
-    fun loadAll(): List<NewsEntity>
-
-    @Query("SELECT * FROM News WHERE category = :category")
-    fun loadByCategory(category: String): List<NewsEntity>
-
-    @Transaction
-    @Query("SELECT * FROM News WHERE id = :newsId")
-    fun loadWithTags(newsId: Int): NewsWithTags
-
-    @Transaction
-    @Query("""
-      SELECT *
-      FROM News
-      INNER JOIN NewsTags ON News.id = NewsTags.newsId
-      INNER JOIN Tags ON Tags.id = NewsTags.tagId
-      WHERE Tags.value IN(:tags)
-      ORDER BY publishedDate DESC
-    """)
-    fun loadSimilar(tags: List<String>): List<NewsWithTags>
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tag: TagEntity): Long
-
-    @Query("SELECT * FROM Tags WHERE value = :value LIMIT 1")
-    fun findByValue(value: String): TagEntity?
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertCrossRef(ref: NewsTags)
+     */
 
 }
-
- */
-
 
 
 /* ---------------------------------------------------------------- */
@@ -267,7 +184,7 @@ private fun NewsWithTags.toDomain() = NewsItem(
     imageUrl      = news.imageUrl,
     source        = news.source,
     isFeatured    = news.isFeatured,
-    imageTags     = tags.map { it.value }
+    imageTags     = tags
 )
 
 
@@ -286,7 +203,7 @@ fun News.toDomain(): NewsItem {
         imageTags = emptyList()
     )
 }
-    fun toNewsItem(entity: News, tags: List<String>) = NewsItem(
+    fun toNewsItem(entity: News, tags: List<Tags>) = NewsItem(
         uuid          = entity.uuid,
         title         = entity.title,
         snippet       = entity.snippet,
@@ -295,7 +212,7 @@ fun News.toDomain(): NewsItem {
         imageUrl      = entity.imageUrl,
         category      = entity.category,
         isFeatured    = entity.isFeatured,
-        imageTags     = ArrayList(tags)
+        imageTags     = tags
     )
 
 
