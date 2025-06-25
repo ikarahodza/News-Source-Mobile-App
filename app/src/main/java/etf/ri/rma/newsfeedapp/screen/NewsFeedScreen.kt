@@ -135,7 +135,7 @@ fun NewsFeedScreen(
 
     }
 
-    //ne pozivaju mi se getallnews pri pokretanju aplikacije
+    //getAllNews mi se poziva i kad nema interneta???
     suspend fun fetchNews(category: String = "Sve", forceRefresh: Boolean = false): List<NewsItem> {
         allNews = NewsService.getAllNews()
 
@@ -314,17 +314,3 @@ fun NewsList(
         }
     }
 }
-
-/*
-private suspend fun syncIntoDb(news: List<NewsItem>, dao: SavedNewsDAO) {
-    withContext(Dispatchers.IO) {
-        news.forEach { item ->
-            if (dao.saveNews(item)) {
-                dao.addTags(item.imageTags, item.uuid) // pretpostavka: item.id dobijen iz saveNews
-            }
-        }
-    }
-}
-
- */
-

@@ -60,7 +60,6 @@ data class NewsWithTags(
     var tags: List<Tags>
 )
 
-/* 1) samo osnovni podaci – bez tagova */
 fun News.toDomain() = NewsItem(
     uuid          = uuid,
     title         = title,
@@ -70,7 +69,7 @@ fun News.toDomain() = NewsItem(
     isFeatured    = isFeatured,
     source        = source,
     publishedDate = publishedDate,
-    imageTags     = emptyList()        // popunit ćeš naknadno
+    imageTags     = emptyList()
 )
 
 

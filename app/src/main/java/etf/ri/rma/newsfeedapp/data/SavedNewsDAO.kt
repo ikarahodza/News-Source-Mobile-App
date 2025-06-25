@@ -28,12 +28,6 @@ interface SavedNewsDAO {
     @Query("SELECT * FROM News WHERE category = :category")
     suspend fun newsWithCategory(category: String): List<News>
 
-    /*
-    suspend fun getNewsWithCategory(category: String): List<NewsItem> =
-        newsWithCategory(category).map { it.toDomain() }
-
-     */
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNews(news: News): Long
 
@@ -138,26 +132,6 @@ interface SavedNewsDAO {
             val tags = getTagsFull(news.id)
             toNewsItem(news, tags)
         }
-
-
-    /*
-        suspend fun allNews(): List<NewsItem> =
-            loadAllNewsWithTags().map { news ->
-                val tags = getTagsFull(news.id)
-                toNewsItem(news, tags)
-            }
-
-
-
-    suspend fun getSimilarNews(tags: List<String>): List<NewsItem> {
-        val firstTwo = tags.take(2)
-        return getSimilarNewsRaw(firstTwo).map { rel ->
-            toNewsItem(rel.news, rel.tags.map { it.value })
-        }
-    }
-
-
-     */
 
 }
 
