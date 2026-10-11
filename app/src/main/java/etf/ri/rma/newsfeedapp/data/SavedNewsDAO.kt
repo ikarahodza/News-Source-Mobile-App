@@ -127,11 +127,14 @@ interface SavedNewsDAO {
         }
     }
 
-    suspend fun getNewsWithCategory(category: String): List<NewsItem> =
-        newsWithCategory(category).map { news ->
+    suspend fun getNewsWithCategory(category: String): List<NewsItem> {
+        // Convert UI category to API category before querying
+        val apiCategory = mapUIToAPICategory(category)
+        return newsWithCategory(apiCategory).map { news ->
             val tags = getTagsFull(news.id)
             toNewsItem(news, tags)
         }
+    }
 
 }
 
@@ -149,27 +152,13 @@ fun NewsItem.toEntity() = News(
     isFeatured = isFeatured
 )
 
-private fun NewsWithTags.toDomain() = NewsItem(
-    uuid          = news.uuid,
-    title         = news.title,
-    snippet       = news.snippet,
-    category      = news.category,
-    publishedDate = news.publishedDate,
-    imageUrl      = news.imageUrl,
-    source        = news.source,
-    isFeatured    = news.isFeatured,
-    imageTags     = tags
-)
-
-
-
 
 fun News.toDomain(): NewsItem {
     return NewsItem(
         uuid = uuid,
         title = title,
         snippet = snippet,
-        category = category,
+        category = NewsService.mapAPIToUICategory(category),
         source = source,
         publishedDate = publishedDate,
         imageUrl = imageUrl,
@@ -177,17 +166,17 @@ fun News.toDomain(): NewsItem {
         imageTags = emptyList()
     )
 }
-    fun toNewsItem(entity: News, tags: List<Tags>) = NewsItem(
-        uuid          = entity.uuid,
-        title         = entity.title,
-        snippet       = entity.snippet,
-        source        = entity.source,
-        publishedDate = entity.publishedDate,
-        imageUrl      = entity.imageUrl,
-        category      = entity.category,
-        isFeatured    = entity.isFeatured,
-        imageTags     = tags
-    )
+fun toNewsItem(entity: News, tags: List<Tags>) = NewsItem(
+    uuid          = entity.uuid,
+    title         = entity.title,
+    snippet       = entity.snippet,
+    source        = entity.source,
+    publishedDate = entity.publishedDate,
+    imageUrl      = entity.imageUrl,
+    category      = NewsService.mapAPIToUICategory(entity.category),
+    isFeatured    = entity.isFeatured,
+    imageTags     = tags
+)
 
 
 

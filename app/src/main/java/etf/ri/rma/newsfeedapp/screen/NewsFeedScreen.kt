@@ -104,13 +104,13 @@ fun NewsFeedScreen(
     val context = LocalContext.current
     val savedNewsDao = NewsDatabase.getInstance(context).savedNewsDAO()
 
-    val isOnline = remember {
+    fun isOnline(): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        cm.activeNetworkInfo?.isConnectedOrConnecting == true
+        return cm.activeNetworkInfo?.isConnectedOrConnecting == true
     }
 
     fun syncToDatabase(news: List<NewsItem>) {
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             news.forEach {item ->
                 val inserted = savedNewsDao.saveNews(item)
                 if(inserted) {
@@ -139,13 +139,13 @@ fun NewsFeedScreen(
     suspend fun fetchNews(category: String = "Sve", forceRefresh: Boolean = false): List<NewsItem> {
         allNews = NewsService.getAllNews()
 
-        return if(isOnline) {
+        return if(isOnline()) {
             try {
                 val remote = if(category == "Sve") {
                     allNews
                 } else {
                     val fromCat = NewsService.getNewsByCategory(NewsService.mapAPIToUICategory(category), forceRefresh = forceRefresh)
-                    allNews + fromCat
+                    (allNews + fromCat).distinctBy { it.uuid }
                 }
                 syncToDatabase(remote)
                 remote
@@ -155,7 +155,7 @@ fun NewsFeedScreen(
             }
         } else {
             val fromDb = fetchNewsFromDatabase(category)
-            allNews + fromDb
+            (allNews + fromDb).distinctBy { it.uuid }
         }
     }
 
@@ -168,6 +168,15 @@ fun NewsFeedScreen(
         }
         backStackEntry?.savedStateHandle?.remove<List<String>>("filteredWords")?.let {
             unwantedWordsFilter = it
+        }
+    }
+
+    // Save current filters to savedStateHandle for FilterScreen to read
+    LaunchedEffect(selectedCategory, dateRangeFilter, unwantedWordsFilter) {
+        navController?.currentBackStackEntry?.savedStateHandle?.apply {
+            set("selectedCategory", selectedCategory)
+            set("dateRange", dateRangeFilter)
+            set("unwantedWords", unwantedWordsFilter)
         }
     }
 

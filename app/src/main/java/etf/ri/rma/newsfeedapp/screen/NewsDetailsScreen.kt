@@ -68,13 +68,13 @@ fun NewsDetailsScreen(
     val context = LocalContext.current
     val savedNewsDao = NewsDatabase.getInstance(context).savedNewsDAO()
 
-    val isOnline = remember {
+    fun isOnline(): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        cm.activeNetworkInfo?.isConnectedOrConnecting == true
+        return cm.activeNetworkInfo?.isConnectedOrConnecting == true
     }
 
     suspend fun fetchNewsById(uuid: String): NewsItem? {
-        return if(isOnline) {
+        return if(isOnline()) {
             try {
                 NewsService.getNewsById(uuid)
             } catch(e:Exception) {
@@ -86,7 +86,7 @@ fun NewsDetailsScreen(
     }
 
     suspend fun fetchSimilarNews(newsItem: NewsItem): List<NewsItem> {
-        return if (isOnline) {
+        return if (isOnline()) {
             try {
                 val similar = NewsService.getSimilarStories(newsItem.uuid)
 
@@ -123,7 +123,7 @@ fun NewsDetailsScreen(
             return cached
         }
 
-        if(isOnline && !newsItem.imageUrl.isNullOrEmpty()) {
+        if(isOnline() && !newsItem.imageUrl.isNullOrEmpty()) {
             return try {
                 val response = imagaDAO.getImageTags(newsItem.imageUrl)
                 val tags = response.result.tags.map {it.tag.en}
@@ -339,17 +339,17 @@ fun NewsDetailsScreen(
                                 .testTag("related_news_title_2")
                         )
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
-                        onClick = onClose,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("details_close_button")
-                    ) {
-                        Text(text = "Zatvori detalje")
-                    }
+                Button(
+                    onClick = onClose,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("details_close_button")
+                ) {
+                    Text(text = "Zatvori detalje")
                 }
             }
         }
@@ -362,8 +362,19 @@ fun NewsDetailsScreen(
 
 
 fun parseDate(dateString: String): Date {
-    val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-    return format.parse(dateString) ?: Date()
+    return try {
+        // Try ISO format first (API format: 2025-05-28T18:46:34.000000Z)
+        val instant = java.time.Instant.parse(dateString)
+        Date.from(instant)
+    } catch (e: Exception) {
+        try {
+            // Fallback to dd-MM-yyyy format (user input format)
+            val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            format.parse(dateString) ?: Date()
+        } catch (e: Exception) {
+            Date()
+        }
+    }
 }
 
 fun formatDate(isoDate: String): String {

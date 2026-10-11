@@ -1,5 +1,6 @@
 package etf.ri.rma.newsfeedapp.data.network.retrofit
 
+import etf.ri.rma.newsfeedapp.BuildConfig
 import etf.ri.rma.newsfeedapp.data.network.api.ImagaApiService
 import etf.ri.rma.newsfeedapp.data.network.api.NewsApiService
 import okhttp3.Credentials
@@ -65,15 +66,13 @@ class RetrofitInstanceNews {
 class RetrofitInstanceImaga {
     companion object {
         private const val BASE_URL = "https://api.imagga.com/"
-        private const val IMAGA_API_KEY = "acc_1f155786164843c"
-        private const val IMAGA_API_SECRET = "32fde55dc7ab1c27b88197a5a834cb03"
 
         private val okHttpClient by lazy {
             OkHttpClient.Builder()
                 .addInterceptor(Interceptor { chain ->
                     val originalRequest = chain.request()
 
-                    val auth = Credentials.basic(IMAGA_API_KEY, IMAGA_API_SECRET)
+                    val auth = Credentials.basic(BuildConfig.IMAGGA_API_KEY, BuildConfig.IMAGGA_API_SECRET)
 
                     val newRequest = originalRequest.newBuilder()
                         .header("Authorization", auth)

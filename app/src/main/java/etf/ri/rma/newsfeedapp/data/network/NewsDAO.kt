@@ -1,5 +1,6 @@
 package etf.ri.rma.newsfeedapp.data.network
 import android.util.Log
+import etf.ri.rma.newsfeedapp.BuildConfig
 import etf.ri.rma.newsfeedapp.data.network.api.NewsApiService
 import etf.ri.rma.newsfeedapp.data.network.exception.InvalidUUIDException
 import etf.ri.rma.newsfeedapp.data.network.retrofit.RetrofitInstanceNews
@@ -9,7 +10,7 @@ import java.util.regex.Pattern
 
 class NewsDAO {
     private var apiService = RetrofitInstanceNews.api
-    private val API_TOKEN = "Nihq8wE92WRug2VxGoWIjmc2huWzgzUmBEnecIRO"
+    private val API_TOKEN = BuildConfig.NEWS_API_KEY
 
     private val allStoriesCache = mutableListOf<Data>()
     private var initialDataLoaded = false

@@ -17,7 +17,6 @@ object NewsService {
     private val _allNews = MutableStateFlow<List<NewsItem>>(emptyList())
     val allNews: StateFlow<List<NewsItem>> = _allNews.asStateFlow()
 
-    private var initialDataLoaded = false
     private val categoryTimestamps = mutableMapOf<String, Long>()
     private val imageTagsCache = mutableMapOf<String, ArrayList<String>>()
     private val similarStoriesCache = mutableMapOf<String, List<NewsItem>>()
@@ -132,7 +131,6 @@ object NewsService {
                 NewsItem.fromData(it).copy(isFeatured = true)
             }
 
-
             if (similarItems.isNotEmpty()) {
                 similarStoriesCache[uuid] = similarItems
             }
@@ -154,9 +152,7 @@ object NewsService {
             val story = _allNews.value.find { it.uuid == uuid }
             return if (story != null) {
                 _allNews.value.filter {
-                    it.uuid != uuid && it.category.any { cat ->
-                        story.category.contains(cat)
-                    }
+                    it.uuid != uuid && it.category.equals(story.category, ignoreCase = true)
                 }.take(2)
             } else {
                 emptyList()
